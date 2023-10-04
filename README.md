@@ -1,12 +1,12 @@
-# `did:web` Decentralized Identifiers Method Spec
+# `did:web3` Decentralized Identifiers Method Spec
 
-This repository contains the `did:web` Decentralized Identifier Method
+This repository contains the `did:web3` Decentralized Identifier Method
 Specification. You can access the latest version of this specification here:
 
-https://w3c-ccg.github.io/did-method-web/
+https://did.coop/did-method-web3/
 
-The W3C Community Group that is working on this specification can be found
-here:
+The W3C Community Group that is works on the specification of which this is a
+fork can be found here:
 
 https://w3c-ccg.github.io/
 

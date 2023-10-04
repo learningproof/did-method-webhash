@@ -3,75 +3,37 @@
 
 <head>
   <meta charset="utf-8">
-  <title>did:web Method Specification</title>
+  <title>did:web3 Method Specification</title>
   <script src="https://www.w3.org/Tools/respec/respec-w3c" async
     class="remove"></script>
   <script class="remove">
     var respecConfig = {
-      specStatus: "CG-DRAFT",
-      shortName: "did-method-web",
-      wg: "Credentials Community Group",
-      wgURI: "https://www.w3.org/community/credentials/",
+      specStatus: "INTERNET-DRAFT",
+      shortName: "did-method-web3",
+      wg: "did.coop",
+      wgURI: "https://did.coop/",
       wgPublicList: "public-credentials",
       editors: [{
-        name: "Michael Prorock",
-        url: "https://www.linkedin.com/in/mprorock/",
-        email: "mprorock@mesur.io",
-        company: "mesur.io",
-        companyURL: "https://mesur.io/"
-      },
-      {
-        name: "Orie Steele",
-        url: "https://www.linkedin.com/in/or13b/",
-        company: "Transmute",
-        companyURL: "https://www.transmute.industries/",
-        w3cid: 109171
-      },
-      {
-        name: "Oliver Terbu",
-        email: "oliver.terbu@consensys.net",
-        company: "Consensys",
-        companyURL: "https://consensys.net"
+        name: "Juan Caballero",
+        url: "https://learningproof.xyz",
+        email: "bumblefudge@learningproof.xyz",
+        company: "learningProof uG",
+        companyURL: "https://learningproof.xyz/"
       }],
       authors: [
         {
-          name: "Christian Gribneau",
-          email: "christian@gribneau.net",
-          company: "Ology Newswire, Inc.",
-          companyURL: "https://ology.com"
-        },
-        {
-          name: "Michael Prorock",
-          email: "mprorock@mesur.io",
-          company: "mesur.io",
-          companyURL: "https://mesur.io/"
-        },
-        {
-          name: "Orie Steele",
-          url: "https://www.linkedin.com/in/or13b/",
-          company: "Transmute",
-          companyURL: "https://www.transmute.industries/",
-          w3cid: 109171
-        },
-        {
-          name: "Oliver Terbu",
-          email: "oliver.terbu@consensys.net",
-          company: "Consensys",
-          companyURL: "https://consensys.net"
-        },
-        {
-          name: "Mike Xu",
-          email: "mike.xu@consensy.net",
-          company: "Consensys",
-          companyURL: "https://consensys.net"
+          name: "Benjamin Goering",
+          email: "bengo@did.coop",
+          company: "did.coop",
+          companyURL: "https://did.coop"
         },
         {
           name: "Dmitri Zagidulin",
-          email: "dzagidulin@gmail.com",
-          company: "Digital Bazaar",
-          companyURL: "https://digitalbazaar.com/"
+          email: "dmitri@did.coop",
+          company: "did.coop",
+          companyURL: "https://did.coop/"
         }],
-      github: "https://github.com/w3c-ccg/did-method-web",
+      github: "https://git.coop/socialweb.coop/did-method-web3",
 
       localBiblio: {
         "DID-PRIMER": {
@@ -95,10 +57,12 @@
 <body>
   <section id="abstract">
     <p>
-      DIDs that target a distributed ledger face significant practical
-      challenges in bootstrapping enough meaningful trusted data around
-      identities to incentivize mass adoption.
-      We propose a new DID method using a web domain's existing reputation.
+      DIDs that require a distributed ledger or trusted clients for resolutions 
+      face significant practical challenges in anchoring trust for many 
+      use-cases targeted by the DID WG at W3C.
+      We propose a new DID method extending did:web with additional trust and 
+      verification properties, that is also backwards compatibility for the
+      trust models and use-cases supported by did:web.
     </p>
   </section>
   <section id="sotd">
@@ -112,7 +76,7 @@
         Preface
       </h2>
       <p>
-        The Web DID method specification conforms to the requirements specified
+        The Web3 DID method specification conforms to the requirements specified
         in the Decentralized Identifiers v1.0 Specification [[DID-CORE]]. For
         more information about DIDs and DID method specifications, please also
         see the [[?DID-PRIMER]]
@@ -127,7 +91,8 @@
       </h2>
 
       <pre class="example"
-        title="Example did:web DID document using JSON Web Keys">
+        title="Example did:web3 DID document using JSON Web Keys">
+TODO: update example, add a JWS-signed rather than `proof`-object example
 {
   "@context": [
     "https://www.w3.org/ns/did/v1",
@@ -184,6 +149,7 @@
 
       <pre class="example"
         title="Example did:web DID document using an ethereum address">
+TODO: update example, possibly use a did:pkh as controller rather than blockchainAccountId?
 {
   "@context": ["https://www.w3.org/ns/did/v1", "https://w3id.org/security/suites/secp256k1recovery-2020/v2"],
   "id": "did:web:example.com",
@@ -204,7 +170,7 @@
 
   <section>
     <h1>
-      Web DID Method Specification
+      Web3 DID Method Specification
     </h1>
 
     <section>
@@ -225,10 +191,11 @@
         Method name
       </h2>
       <p>
-        The namestring that shall identify this DID method is: <code>web</code>.
-
+        The namestring that shall identify this DID method is: <code>web3</code>.
+      </p>
+      <p>
         A DID that uses this method MUST begin with the following prefix:
-        <code>did:web</code>. Per the DID specification, this string MUST be in
+        <code>did:web3</code>. Per the DID specification, this string MUST be in
         lowercase. The remainder of the DID, after the prefix, is specified
         below.
       </p>
@@ -249,7 +216,10 @@
         SSL/TLS certificate, and it MUST NOT include IP addresses. A port MAY be
         included and the colon MUST be percent encoded to prevent a conflict
         with paths. Directories and subdirectories MAY optionally be included,
-        delimited by colons rather than slashes.
+        delimited by colons rather than slashes. Additionally, a hash of the
+        first DID document published for a given method-specific identifier 
+        MUST be appended (delimited by a colon), after the path if present, to
+        any web3 method identifiers.
       </p>
 
       <pre class="nohighlight">
