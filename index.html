@@ -66,12 +66,18 @@
 <body>
   <section id="abstract">
     <p>
-      DIDs that require a distributed ledger or trusted clients for resolutions 
-      face significant practical challenges in anchoring trust for many 
-      use-cases targeted by the DID WG at W3C.
-      We propose a new DID method extending did:webhash with additional trust and 
-      verification properties, that is also backwards compatibility for the
-      trust models and use-cases supported by did:webhash.
+      DIDs that require a distributed ledger or trusted clients for resolutions
+      face significant practical challenges in anchoring trust for many
+      use-cases targeted by the DID WG at W3C. Conversely, however, DNS-based
+      methods have little in the way of verifiability and are susceptible to
+      malicious or duplicitous DID controllers abusing control of domains under
+      their control, as DID documents in the classic did:web model are neither
+      signed nor self-certifying, with no standardized mechanisms defined for
+      witnessing structures to vouchsafe historical authenticity. We propose a
+      new DID method extending did:web with additional trust and verification
+      properties based on standard hashing methods that can be extended in
+      implementation-specific ways, while also offering backwards compatibility
+      for the trust models and use-cases supported by did:web.
     </p>
   </section>
   <section id="sotd">
