@@ -3,13 +3,13 @@
 
 <head>
   <meta charset="utf-8">
-  <title>did:web3 Method Specification</title>
+  <title>did:webhash Method Specification</title>
   <script src="https://www.w3.org/Tools/respec/respec-w3c" async
     class="remove"></script>
   <script class="remove">
     var respecConfig = {
       specStatus: "INTERNET-DRAFT",
-      shortName: "did-method-web3",
+      shortName: "did-method-webhash",
       wg: "did.coop",
       wgURI: "https://did.coop/",
       wgPublicList: "public-credentials",
@@ -33,7 +33,7 @@
           company: "did.coop",
           companyURL: "https://did.coop/"
         }],
-      github: "https://git.coop/socialweb.coop/public/did-method-web3/-",
+      github: "https://git.coop/socialweb.coop/public/did-method-webhash/-",
 
       localBiblio: {
         "DID-PRIMER": {
@@ -69,9 +69,9 @@
       DIDs that require a distributed ledger or trusted clients for resolutions 
       face significant practical challenges in anchoring trust for many 
       use-cases targeted by the DID WG at W3C.
-      We propose a new DID method extending did:web with additional trust and 
+      We propose a new DID method extending did:webhash with additional trust and 
       verification properties, that is also backwards compatibility for the
-      trust models and use-cases supported by did:web.
+      trust models and use-cases supported by did:webhash.
     </p>
   </section>
   <section id="sotd">
@@ -85,7 +85,7 @@
         Preface
       </h2>
       <p>
-        The Web3 DID method specification conforms to the requirements specified
+        The WebHash DID method specification conforms to the requirements specified
         in the Decentralized Identifiers v1.0 Specification [[DID-CORE]]. For
         more information about DIDs and DID method specifications, please also
         see the [[?DID-PRIMER]]
@@ -101,18 +101,18 @@
 
       <div class="issue" data-number="1"></div>
       <pre class="example"
-        title="Example did:web3 DID document using JSON Web Keys">
+        title="Example did:webhashhash DID document using JSON Web Keys">
 {
   "@context": [
     "https://www.w3.org/ns/did/v1",
     "https://w3id.org/security/suites/jws-2020/v1"
   ],
-  "id": "did:web:example.com",
+  "id": "did:webhash:example.com",
   "verificationMethod": [
     {
-      "id": "did:web:example.com#key-0",
+      "id": "did:webhash:example.com#key-0",
       "type": "JsonWebKey2020",
-      "controller": "did:web:example.com",
+      "controller": "did:webhash:example.com",
       "publicKeyJwk": {
         "kty": "OKP",
         "crv": "Ed25519",
@@ -120,9 +120,9 @@
       }
     },
     {
-      "id": "did:web:example.com#key-1",
+      "id": "did:webhash:example.com#key-1",
       "type": "JsonWebKey2020",
-      "controller": "did:web:example.com",
+      "controller": "did:webhash:example.com",
       "publicKeyJwk": {
         "kty": "OKP",
         "crv": "X25519",
@@ -130,9 +130,9 @@
       }
     },
     {
-      "id": "did:web:example.com#key-2",
+      "id": "did:webhash:example.com#key-2",
       "type": "JsonWebKey2020",
-      "controller": "did:web:example.com",
+      "controller": "did:webhash:example.com",
       "publicKeyJwk": {
         "kty": "EC",
         "crv": "P-256",
@@ -142,34 +142,34 @@
     },
   ],
   "authentication": [
-    "did:web:example.com#key-0",
-    "did:web:example.com#key-2"
+    "did:webhash:example.com#key-0",
+    "did:webhash:example.com#key-2"
   ],
   "assertionMethod": [
-    "did:web:example.com#key-0",
-    "did:web:example.com#key-2"
+    "did:webhash:example.com#key-0",
+    "did:webhash:example.com#key-2"
   ],
   "keyAgreement": [
-    "did:web:example.com#key-1", 
-    "did:web:example.com#key-2"
+    "did:webhash:example.com#key-1", 
+    "did:webhash:example.com#key-2"
   ]
 }
         </pre>
 
         <div class="issue" data-number="1"></div>
         <pre class="example"
-        title="Example did:web DID document using an ethereum address">
+        title="Example did:webhash DID document using an ethereum address">
 {
   "@context": ["https://www.w3.org/ns/did/v1", "https://w3id.org/security/suites/secp256k1recovery-2020/v2"],
-  "id": "did:web:example.com",
+  "id": "did:webhash:example.com",
   "verificationMethod": [{
-      "id": "did:web:example.com#address-0",
+      "id": "did:webhash:example.com#address-0",
       "type": "EcdsaSecp256k1RecoveryMethod2020",
-      "controller": "did:web:example.com",
+      "controller": "did:webhash:example.com",
       "blockchainAccountId": "eip155:1:0x89a932207c485f85226d86f7cd486a89a24fcc12"
   }],
   "authentication": [
-      "did:web:example.com#address-0"
+      "did:webhash:example.com#address-0"
   ]
 }
         </pre>
@@ -179,7 +179,7 @@
 
   <section>
     <h1>
-      Web3 DID Method Specification
+      webhash DID Method Specification
     </h1>
 
     <section>
@@ -187,7 +187,7 @@
         Target system
       </h2>
       <p>
-        The target system of the Web3 DID method is the host (or domain if the
+        The target system of the webhash DID method is the host (or domain if the
         host
         is not specified) name when the domain specified by the DID is resolved
         through the Domain Name System (DNS).
@@ -200,11 +200,11 @@
         Method name
       </h2>
       <p>
-        The namestring that shall identify this DID method is: <code>web3</code>.
+        The namestring that shall identify this DID method is: <code>webhash</code>.
       </p>
       <p>
         A DID that uses this method MUST begin with the following prefix:
-        <code>did:web3</code>. Per the DID specification, this string MUST be in
+        <code>did:webhash</code>. Per the DID specification, this string MUST be in
         lowercase. The remainder of the DID, after the prefix, is specified
         below.
       </p>
@@ -228,27 +228,27 @@
         delimited by colons rather than slashes. Additionally, a hash of the
         first DID document published for a given method-specific identifier 
         MUST be appended (delimited by a colon), after the path if present, to
-        any web3 method identifiers.
+        any webhash method identifiers.
       </p>
       <p>
-        The syntax of a <code>web3</code> DID string, expressed as a pseudo 
+        The syntax of a <code>webhash</code> DID string, expressed as a pseudo 
         regular expression, is:<br>
-        <code>did:web3:{valid domain}[:[^/:#?]+]*:{hash of first DID document}</code>
+        <code>did:webhash:{valid domain}[:[^/:#?]+]*:{hash of first DID document}</code>
       </p>
 
       <pre class="nohighlight">
-web3-did = "did:web3:" domain-name
-web3-did = "did:web3:" domain-name * (":" path)
+webhash-did = "did:webhash:" domain-name
+webhash-did = "did:webhash:" domain-name * (":" path)
         </pre>
 
 
         <div class="issue" data-number="2"></div>
         <pre class="example nohighlight" title="Example Web Method DIDs">
-did:web3:w3c-ccg.github.io
+did:webhash:w3c-ccg.github.io
 
-did:web3:w3c-ccg.github.io:user:alice
+did:webhash:w3c-ccg.github.io:user:alice
 
-did:web3:example.com%3A3000
+did:webhash:example.com%3A3000
         </pre>
     </section>
     <section>
@@ -257,7 +257,7 @@ did:web3:example.com%3A3000
       </h2>
       <p>
         Due to the way most web servers present content, it is likely that a
-        particular `did:web3` document will be served with a media type of
+        particular `did:webhash` document will be served with a media type of
       `application/json`. If a document is retrieved and it is named
       `did.json`, a few processing rules should apply:
       <ul>
@@ -270,7 +270,7 @@ did:web3:example.com%3A3000
           object according to the referenced [[?DATA-INTEGRITY]] cryptosuite.
           If either the former or latter are not possible, or if the document 
           fails processing or verification, the document should be rejected 
-          from consideration as a `did:web3` doc.
+          from consideration as a `did:webhash` doc.
         </li>
         <li>
           If an
@@ -292,7 +292,7 @@ did:web3:example.com%3A3000
       </ul>
       </p>
       <p>
-        Whenever a DID URL is present within a `did:web3` document, it must
+        Whenever a DID URL is present within a `did:webhash` document, it must
         be an absolute URL.
       <p class="note">
         This includes URLs inside of embedded key material and other metadata, and
@@ -307,7 +307,7 @@ did:web3:example.com%3A3000
       </h2>
       <section>
         <p>
-          There is intentionally no HTTP API specified for did:web method
+          There is intentionally no HTTP API specified for did:webhash method
           operations leaving programmatic registrations and management to be
           defined by each implementation, or based on their own requirements in
           their web environment.
@@ -357,7 +357,7 @@ did:web3:example.com%3A3000
         <div class="issue" data-number="2"></div>
 
         <pre class="example nohighlight" title="Creating the DID">
-did:web3:w3c-ccg.github.io
+did:webhash:w3c-ccg.github.io
  -> https://w3c-ccg.github.io/did.json
           </pre>
 
@@ -368,7 +368,7 @@ did:web3:w3c-ccg.github.io
 
         <pre class="example nohighlight"
           title="Creating the DID with optional path">
-did:web3:w3c-ccg.github.io:user:alice
+did:webhash:w3c-ccg.github.io:user:alice
  -> https://w3c-ccg.github.io/user/alice/did.json
           </pre>
 
@@ -381,7 +381,7 @@ did:web3:w3c-ccg.github.io:user:alice
 
         <pre class="example nohighlight"
           title="Creating the DID with optional path and port">
-did:web3:example.com%3A3000:user:alice
+did:webhash:example.com%3A3000:user:alice
  -> https://example.com:3000/user/alice/did.json
           </pre>
       </section>
@@ -392,7 +392,7 @@ did:web3:example.com%3A3000:user:alice
         </h3>
         <p>
           The following steps MUST be executed to resolve the DID document from
-          a Web3 DID:
+          a webhash DID:
         </p>
 
         <ol>
@@ -497,7 +497,7 @@ did:web3:example.com%3A3000:user:alice
         <p>
           This DID method does not specify any authentication or authorization
           mechanism for writing to, removing or creating the DID Document,
-          leaving it up to implementations to protect did:web3 documents as with
+          leaving it up to implementations to protect did:webhash documents as with
           any other web resource.
         </p>
         <p>
@@ -515,7 +515,7 @@ did:web3:example.com%3A3000:user:alice
         </h4>
         <p>
           DNS presents many of the attack vectors that enable active security
-          and privacy attacks on the did:web method and it's important that
+          and privacy attacks on the did:webhash method and it's important that
           implementors address these concerns via proper configuration of DNS.
           For example, without proper security of the DNS resolution via <a
             href="https://tools.ietf.org/html/rfc8484">DNS over HTTPS</a> it's
@@ -538,8 +538,8 @@ did:web3:example.com%3A3000:user:alice
           DNS Privacy Considerations
         </h4>
         <p>
-          Due to the nature of the did:web method relying upon a DNS in order to
-          resolve the web server, all resolutions of a did:web identifier have
+          Due to the nature of the did:webhash method relying upon a DNS in order to
+          resolve the web server, all resolutions of a did:webhash identifier have
           the potential to be tracked by a DNS provider. Additionally, due to
           the DID Document being stored on a web server, each time the DID
           Document resource is retrieved, the web server has the ability to
@@ -562,7 +562,7 @@ did:web3:example.com%3A3000:user:alice
           Guidance from <a
             href="https://csrc.nist.gov/publications/detail/sp/800-52/rev-2/final">
             NIST SP 800-52 Rev. 2
-          </a> or superceding, MUST be followed for delivery of a `did:web`
+          </a> or superceding, MUST be followed for delivery of a `did:webhash`
           document.
         </p>
 
@@ -689,7 +689,7 @@ did:web3:example.com%3A3000:user:alice
         </p>
 
         <pre class="nohighlight">
-did:web:example.com:u:bob
+did:webhash:example.com:u:bob
           </pre>
         <p>
           resolves to the DID document at:
