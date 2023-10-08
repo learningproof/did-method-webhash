@@ -193,10 +193,9 @@
         Target system
       </h2>
       <p>
-        The target system of the webhash DID method is the host (or domain if the
-        host
-        is not specified) name when the domain specified by the DID is resolved
-        through the Domain Name System (DNS).
+        The target system of the webhash DID method is the host (or domain if
+        the host is not specified) name when the domain specified by the DID is
+        resolved through the Domain Name System (DNS).
       </p>
 
     </section>
@@ -229,17 +228,20 @@
       <p>
         The method specific identifier MUST match the common name used in the
         SSL/TLS certificate, and it MUST NOT include IP addresses. A port MAY be
-        included and the colon MUST be percent encoded to prevent a conflict
+        included and the colon MUST be percent-encoded to prevent a conflict
         with paths. Directories and subdirectories MAY optionally be included,
-        delimited by colons rather than slashes. Additionally, a hash of the
-        first DID document published for a given method-specific identifier 
-        MUST be appended (delimited by a colon), after the path if present, to
-        any webhash method identifiers.
+        delimited by colons rather than slashes. 
+      </p>
+      <p>        
+        Additionally, a hash value for the unsigned "payload" of the
+        currently-valid DID document (i.e., the "backwards-compatible" one that
+        is also a valid did:web document) MAY be appended (delimited by a
+        colon), after the path if present, to any webhash method identifiers.
       </p>
       <p>
         The syntax of a <code>webhash</code> DID string, expressed as a pseudo 
         regular expression, is:<br>
-        <code>did:webhash:{valid domain}[:[^/:#?]+]*:{hash of first DID document}</code>
+        <code>did:webhash:{valid domain}[:[^/:#?]+]*[:{hash of first DID document}]{0,1}</code>
       </p>
 
       <pre class="nohighlight">
@@ -264,42 +266,20 @@ did:webhash:example.com%3A3000
       <p>
         Due to the way most web servers present content, it is likely that a
         particular `did:webhash` document will be served with a media type of
-      `application/json`. If a document is retrieved and it is named
-      `did.json`, a few processing rules should apply:
-      <ul>
-        <li>
-          <div class="issue" data-number="3"></div>
-          If an
-          `@context` is present at the root of the JSON document,
-          the document should be processed according to the JSON-LD rules,
-          including verifying the signature included in its <code>proof</code>
-          object according to the referenced [[?DATA-INTEGRITY]] cryptosuite.
-          If either the former or latter are not possible, or if the document 
-          fails processing or verification, the document should be rejected 
-          from consideration as a `did:webhash` doc.
-        </li>
-        <li>
-          If an
-          `@context` is present at the root of the JSON document,
-          and it passes JSON-LD processing, and it contains the context
-          `https://www.w3.org/ns/did/v1`, it may be further processed
-          as a DID document as specified by section
-          <a href="https://www.w3.org/TR/did-core/#consumption-0">6.3.2</a> of
-          the
-          [[did-core]] specification.
-        </li>
-        <li>
-          If no
-          `@context` is present, it should be processed via normal
-          JSON rules for DID processing as specified in section
-          <a href="https://www.w3.org/TR/did-core/#consumption">6.2.2</a> of the
-          [[did-core]] specification, including verification of its signature.
-        </li>
-      </ul>
+        `application/json`. If a document is retrieved and it is named
+        `did.json`, it can be parsed as a JSON object; depending on the contents
+        of the <code>proof</code> object(s) attached, it can be verified as a
+        valid JSON-LD document (see section
+        <a href="https://www.w3.org/TR/did-core/#consumption-0">6.3.2</a> of the
+        [[did-core]] specification.) and/or reconstructed to form a a valid JWS
+        truple (see section
+        <a href="https://www.w3.org/TR/did-core/#consumption-0">6.3.2</a> of
+        the
+        [[did-core]] specification) for verification.
       </p>
       <p>
-        Whenever a DID URL is present within a `did:webhash` document, it must
-        be an absolute URL.
+        Whenever a DID URL is present within a `did:webhash` document, it MUST
+        be an absolute URL *without* the hash-segment appended.
       <p class="note">
         This includes URLs inside of embedded key material and other metadata, and
         prevents key confusion attacks.
@@ -313,12 +293,13 @@ did:webhash:example.com%3A3000
       </h2>
       <section>
         <p>
-          There is intentionally no HTTP API specified for did:webhash method
-          operations leaving programmatic registrations and management to be
-          defined by each implementation, or based on their own requirements in
-          their web environment.
+          There is intentionally no HTTP API specified for the did:webhash
+          method operations, leaving programmatic registrations and management
+          to be defined by each implementation, or based on their own
+          requirements in their web environment.
         </p>
-        </p>
+      </section>
+      <section>    
         <h3>
           Create (Register)
         </h3>
@@ -334,25 +315,33 @@ did:webhash:example.com%3A3000
             lookup service
           </li>
           <li>
-            creating and signing the DID document with a suitable keypair,
-            e.g. using the Koblitz Curve, and storing the <code>did.json</code>
-            file at the domain (qualified or unqualifed) that the did identifier
-            (without hash segment) translates to when <code>:</code>s are
-            replaced with <code>/</code>s.
+            creating the payload DID document (without <code>proof</code>
+            object) that will be hashed and then signed with all the relevant
+            keys referenced at absolute DID URLs <strong>without</strong> a hash
+            segment appended.
           </li>
           <li>
-            <div class="issue" data-number="4"></div>
-            once created, an initial or "genesis" DID document should be hashed
-            according to a standard hash function and encoding which can be
-            described in DID document metadata to enable entire DID document
-            histories to be verifiable. (See the section "Generating 
-            entropic identifiers for DID documents" for more default method
-            and alternatives). Once generated, this hash will be the entropic
-            identifier segment that should be appended to the domain (or
-            domain and path) after a <code>:</code> separator; this segment
-            should be retained across all rotation and update operations.
+            signing the unproofed DID document with a approprate keypair from
+            the DID document and appending one or more <code>proof</code>
+            objects to the DID document containing and describing said signature
+            (See the section "Signing DID Documents" for default method and
+            alternatives).
           </li>
-
+          <li>
+            hashing the proofed DID document to generate the "hash segment"
+            needed for both publishing and securely using the DID. (See the
+            section "Generating entropic identifiers for DID documents" for more
+            default method and alternatives).
+          </li>
+          <li>              
+            publishing the proofed DID Document as the file
+            <code>did.json</code> at the domain (qualified or unqualifed) that
+            the did identifier (without hash segment) translates to when
+            <code>:</code>s are replaced with <code>/</code>s, <strong>as well
+            as</strong> the domain (qualified or unqualified) that the did
+            identifier (with hash segment) translates to when <code>:</code>s
+            are replaced with <code>/</code>s.
+          </li>
         </ol>
 
         <p>
@@ -389,7 +378,7 @@ did:webhash:w3c-ccg.github.io:user:alice
           title="Creating the DID with optional path and port">
 did:webhash:example.com%3A3000:user:alice
  -> https://example.com:3000/user/alice/did.json
-          </pre>
+        </pre>
       </section>
 
       <section>
@@ -404,10 +393,11 @@ did:webhash:example.com%3A3000:user:alice
         <ol>
           <li>
             Replace ":" with "/" in the method specific identifier to obtain the
-            fully qualified domain name and optional path.
+            fully qualified domain name and optional path, whether a hash
+            segment is appended or not.
           </li>
           <li>
-            If the domain contains a port percent decode the colon.
+            If the domain contains a port, percent-decode the colon.
           </li>
           <li>
             Generate an HTTPS URL to the expected location of the DID document
@@ -428,7 +418,6 @@ did:webhash:example.com%3A3000:user:alice
             tracking of the identity being resolved.
           </li>
         </ol>
-
       </section>
 
       <section>
@@ -436,30 +425,22 @@ did:webhash:example.com%3A3000:user:alice
           Update
         </h3>
         <p>
-          To update the DID document, the <code>did.json</code> has to be
-          updated. Please note that the DID (including its entropic 
-          identifier segment) will remain the same, but the
-          contents of the DID document could change, e.g., by including a new
-          verification key or adding service endpoints.
-        </p>
-
-        <p>
           <div class="issue" data-number="6"></div>
-          When updating the DID document, the value of root DID document
-          property <code>prev</code> should be set to the hash of the previous
-          DID document to create a verifiable chain of cryptographic
-          commitments. Similarly, the software hosting the DID documents should
-          track the number of versions starting from 0 (for the initial
-          document) such that DID Resolution metadata can include that
-          sequential integer counter as the value of <code>versionId</code>,
-          which gives consumers an indication of how long a chain they will need
-          to "walk" to verify all did documents back to the original DID
-          document, i.e., the document returned when the DID is queried with
-          <code>?versionId=0</code> appended to the DID URI. (See section
-          "Serving historical DIDs over HTTP or HTTPS")
+          When generating a new DID document, the value of root DID document
+          property <code>prev</code> should be set to the current DID
+          <strong>with</strong> the version-specific hash segment appended. 
+        </p>
+        <p>
+          Once updated, the new DID document must be published. The
+          <code>did.json</code> corresponding to the identifier
+          <strong>without</strong> a hash segment appended must be replaced with
+          a new (and newly-proofed) DID document. This new DID document MUST
+          also be published at the path corresponding to the identifier
+          <strong>with</strong> the new document's hash segment.
         </p>
 
-        <div class="issue" data-number="7"></div>
+        <div class="issue" data-number="7">Should this paragraph be removed in
+        leiu of a Witnessing section?</div>
         <p class="note">
           Managing updates to the DID Document using a version control system
           such as git and/or a continuous integration system such as GitHub 
@@ -479,13 +460,97 @@ did:webhash:example.com%3A3000:user:alice
 
       <section>
         <h3>
+          Deactivate (Tombstone)
+        </h3>
+        <p>
+          To delete the DID document without revoking or "disavowing" all
+          previous history of the DID, a new DID <code>did.json</code> should be
+          stripped of all values except `prev` and all key material, then signed
+          and published as usual, making future updates unverifiable (as no
+          future DID document can be signed by a key contained in the previous
+          document).
+        </p>
+      </section>
+      <section>
+        <h3>
           Deactivate (Revoke)
         </h3>
         <p>
-          To delete the DID document, the <code>did.json</code> should be
-          stripped of all values except `prev` and all key material, then signed
-          and published as usual, making future updates unverifiable (as they
-          will not be signed by a key contained in the previous document).
+          To delete the DID document and revoke all previous history of the DID,
+          the current <code>did.json</code> and those corresponding to all
+          previous hash-segment-appended versions should be deleted from the
+          corresponding domain.
+        </p>
+      </section>
+      <section>
+        <h3>
+          Generating entropic identifiers for DID documents
+        </h3>
+        <p>
+          As the name webhash would imply, each DID document published to the
+          web is intended to be addressable stably and archivally by an entropic
+          identifier, such as one produced by a deterministic and standard hash
+          function. This allows a "microledger" style history of each DID, since
+          each DID document after the first contains a back-link to the previous
+          one in the form of a <code>prev</code> property, the value of which is
+          includes the hash of the previous unproofed DID document. It also
+          enables multiple witnessing structures to "mirror" or sync witnessed
+          DID documents across architectures, and even for DID histories to span
+          multiple domains (although these cannot be considered verified without
+          some form of additional input from a witness of some kind).
+        </p>
+        <p>
+          To generate a deterministic hash, canonicalize an unproofed DID
+          document according to <a
+          href=https://www.rfc-editor.org/rfc/rfc8785>RFC 8785</a>, for which
+          standard tooling is readily available at time of press. The hash
+          function and expression used is a <code>SHA256</code>
+          ASCII-encoded as a 32 characters in the <code>base58btc</code>
+          alphabet. This is commonly referred to as a <a
+          href=https://github.com/multiformats/cid#cidv0>"CIDv0"</a> in
+          IPFS-based systems for content-addressed key/value storage, and common
+          IPFS tooling can be used to generate such hashes from canonicalized
+          JSON objects regardless of an implementation's choice of storage or
+          witnessing mechanisms.
+        </p>
+      </section>
+      <section>
+        <h3>
+          Historical Query and Walking Backlinks
+        </h3>
+        <p>
+          Dynamic web services or complex redirecting policies MAY be
+          implemented to allow consumers to query by resolution metadata via
+          query parameters like <code>?versionId=</code> or
+          <code>?versionTime=</code> (see section
+          <a
+          href="https://www.w3.org/TR/did-core/#did-document-metadata">7.1.3</a>
+          of the [[did-core]] specification), but this is not required for
+          conformance. Publishing according to this specification allows
+          witnesses and consumers alike to reconstruct the entire history of a
+          given did by recursing through the <code>prev</code> property of each
+          resolved and verified DID document starting at the presently-valid one
+          (which can be queried without hash segment). 
+        </p>
+        <p>  
+          In low-trust environments, protection against duplicitous or
+          inauthentic DID histories can be achieved by
+          <ol>
+            <li>establishing a complete
+              DID history walking back from the presently-valid DID document (i.e.
+              querying without a hash segment and then resolving each
+              <code>prev</code> DID until a DID without a <code>prev</code> is
+              resolved), then</li>
+            <li>querying a trusted witnessing service (e.g. by hash segment
+              value, <code>versionId</code>, and/or <code>versionTime</code>)
+              or querying any other form of external verifiable
+              data registry, including git-based records, snapshotting systems,
+              key-value stores that store resolution metadata, and/or by
+              content-addressed archives, and then</li>
+              <li>confirming the provenance of the requested current or
+              historical DID document as per use-case and witnessing system
+              properties.</li>
+          </ol>  
         </p>
       </section>
     </section>
