@@ -14,7 +14,7 @@
       wgURI: "https://did.coop/",
       wgPublicList: "public-credentials",
       editors: [{
-        name: "Juan Caballero", 
+        name: "Juan Caballero",
         url: "https://learningproof.xyz",
         email: "bumblefudge@learningproof.xyz",
         company: "learningProof uG",
@@ -105,6 +105,7 @@
 {
   "@context": [
     "https://www.w3.org/ns/did/v1",
+    "https://w3id.org/did/webhash/v0.1",
     "https://w3id.org/security/suites/jws-2020/v1"
   ],
   "id": "did:webhash:example.com",
@@ -150,7 +151,7 @@
     "did:webhash:example.com#key-2"
   ],
   "keyAgreement": [
-    "did:webhash:example.com#key-1", 
+    "did:webhash:example.com#key-1",
     "did:webhash:example.com#key-2"
   ]
 }
@@ -224,16 +225,16 @@
         SSL/TLS certificate, and it MUST NOT include IP addresses. A port MAY be
         included and the colon MUST be percent-encoded to prevent a conflict
         with paths. Directories and subdirectories MAY optionally be included,
-        delimited by colons rather than slashes. 
+        delimited by colons rather than slashes.
       </p>
-      <p>        
+      <p>
         Additionally, a hash value for the unsigned "payload" of the
         currently-valid DID document (i.e., the "backwards-compatible" one that
         is also a valid did:web document) MAY be appended (delimited by a
         colon), after the path if present, to any webhash method identifiers.
       </p>
       <p>
-        The syntax of a <code>webhash</code> DID string, expressed as a pseudo 
+        The syntax of a <code>webhash</code> DID string, expressed as a pseudo
         regular expression, is:<br>
         <code>did:webhash:{valid domain}[:[^/:#?]+]*[:{hash of first DID document}]{0,1}</code>
       </p>
@@ -296,7 +297,7 @@ did:webhash:example.com%3A3000
           requirements in their web environment.
         </p>
       </section>
-      <section>    
+      <section>
         <h3>
           Create (Register)
         </h3>
@@ -330,7 +331,7 @@ did:webhash:example.com%3A3000
             section "Generating entropic identifiers for DID documents" for more
             default method and alternatives).
           </li>
-          <li>              
+          <li>
             publishing the proofed DID Document as the file
             <code>did.json</code> at the domain (qualified or unqualifed) that
             the did identifier (without hash segment) translates to when
@@ -367,7 +368,7 @@ did:webhash:w3c-ccg.github.io:user:alice
         <p>
           If an optional port is specified on the domain, the port colon
           splitting the host and the port MUST be percent encoded to prevent
-          collision with the colons used as separators between domain, 
+          collision with the colons used as separators between domain,
           optional path, and entoropic identifier.
         </p>
 
@@ -425,7 +426,7 @@ did:webhash:example.com%3A3000:user:alice
           <div class="issue" data-number="6"></div>
           When generating a new DID document, the value of root DID document
           property <code>prev</code> should be set to the current DID
-          <strong>with</strong> the version-specific hash segment appended. 
+          <strong>with</strong> the version-specific hash segment appended.
         </p>
         <p>
           Once updated, the new DID document must be published. The
@@ -440,9 +441,9 @@ did:webhash:example.com%3A3000:user:alice
         leiu of a Witnessing section?</div>
         <p class="note">
           Managing updates to the DID Document using a version control system
-          such as git and/or a continuous integration system such as GitHub 
-          Actions can provide support for authentication and audit history, 
-          whether as an input to the witnessing services described in the 
+          such as git and/or a continuous integration system such as GitHub
+          Actions can provide support for authentication and audit history,
+          whether as an input to the witnessing services described in the
           section "Witnessing Services" or as a fallback for manual
           verification when Witnessing Services cannot be relied upon to
           vouchsafe historical records of a DID document's history.
@@ -527,9 +528,9 @@ did:webhash:example.com%3A3000:user:alice
           witnesses and consumers alike to reconstruct the entire history of a
           given did by recursing through the <code>prev</code> property of each
           resolved and verified DID document starting at the presently-valid one
-          (which can be queried without hash segment). 
+          (which can be queried without hash segment).
         </p>
-        <p>  
+        <p>
           In low-trust environments, protection against duplicitous or
           inauthentic DID histories can be achieved by
           <ol>
@@ -547,7 +548,7 @@ did:webhash:example.com%3A3000:user:alice
               <li>confirming the provenance of the requested current or
               historical DID document as per use-case and witnessing system
               properties.</li>
-          </ol>  
+          </ol>
         </p>
       </section>
     </section>
@@ -719,7 +720,7 @@ did:webhash:example.com%3A3000:user:alice
           International Domain Names
         </h3>
         <p>
-          [[DID-CORE]] identifier syntax does not 
+          [[DID-CORE]] identifier syntax does not
           allow Unicode in method name nor method specific identifiers.
         </p>
         <p>
