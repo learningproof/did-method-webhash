@@ -97,7 +97,7 @@
 
     <section>
       <h2>
-        Design Constraints
+        Design Constraints and Motivation
       </h2>
 
       <p>
@@ -111,10 +111,43 @@
           an existing DID Web resolver is able to fetch and process it).
         </li>
         <li><strong>Static web hosting</strong>: DID Documents must be able to
-          be hosted on static web servers (with no support for query parameters).</li>
+          be hosted on static web servers (with no support for query parameters
+          or custom HTTP headers).</li>
       </ol>
 
       <div class="issue">Should modularity / using Traits be a design issue?</div>
+
+      <section>
+        <h3>
+          Trust Model
+        </h3>
+
+        <div class="issue">Add section on the did:webhash Trust Model (requires
+          DNS/ICANN/CA infrastructure for resolution, website operator has the power
+          to disrupt key rotation chains, which means Witnesses are ultimately
+          necessary).
+        </div>
+      </section>
+
+
+      <section>
+        <h3>
+          Separation of Server Operator and DID Controller
+        </h3>
+
+        <p>The division of responsibilities into two different parties,
+          separating the web server Operator from the DID Controller, is a primary
+          motivation for creating a new DID method instead of continuing to
+          use <code>did:web</code>.
+        </p>
+
+        <ul>
+          <li>Is crucial in "multi-tenancy" scenarios (either via subdomains
+          or subdirectories).</li>
+          <li>Allows for greater availability, archiving, and migration to
+          other domains or other DID methods.</li>
+        </ul>
+      </section>
     </section>
 
     <section>
@@ -128,27 +161,46 @@
         microledger-based methods currently under development.
       </p>
       <ul>
-        <li><code>did:web</code></li>
+        <li><code>did:web</code> - No key rotation history; the DID Document
+          contains only the latest valid keys. Unsigned DID docs.</li>
         <li><code>did:webs</code> - see the
-          <a href="https://trustoverip.github.io/tswg-did-method-webs-specification/">DID Method did:webs Specification</a></li>
+          <a href="https://trustoverip.github.io/tswg-did-method-webs-specification/">DID Method did:webs Specification</a>.
+          Key rotation events at a separate location (in KERI format).
+        </li>
         <li><code>did:webplus</code> - see
           <a href="https://github.com/LedgerDomain/did-webplus">https://github.com/LedgerDomain/did-webplus</a></li>
+        <li><code>did:plc</code> - key rotation events at a separate location</li>
       </ul>
 
       <div class="issue">Add text comparing did:webhash to did:webs and similar
-        methods.</div>
-    </section>
+        methods.
+      </div>
 
-    <section>
-      <h2>
-        <code>did:webhash</code> Trust Model
-      </h2>
+      <section>
+        <h3>Enhancements and Differences from <code>did:web</code></h3>
 
-      <div class="issue">Add section on the did:webhash Trust Model (requires
-      DNS/ICANN/CA infrastructure for resolution, website operator has the power
-      to disrupt key rotation chains, which means Witnesses are ultimately
-      necessary).</div>
+        <p>The differences are nonbreaking and additive (see the Design
+          Constraints section).</p>
 
+        <ul>
+          <li>Introduces the <code>previous</code> term for backwards chaining,
+            as well as a corresponding algorithm for chain verification.</li>
+          <li>DID Documents must be signed.</li>
+          <li>Requires the use of the <code>controller</code> term (specifically,
+            DID document update and key rotation events must be signed by
+            the <code>controller</code> DID (specifically, by a key
+            authorized in its <code>assertionMethod</code> section).
+          </li>
+          <li>Requires the use of an entropic identifier as a path fragment.</li>
+          <li>Because there is always a path fragment, no <code>.well-known/</code>
+            directory mechanism is used for a DID at the "top" domain level.</li>
+          <li>Requires the use of Tombstones when a DID is deactivated.</li>
+          <li>Provides affordances for DID migration and archiving (for end-of-life
+            and migration from non-cooperative server scenarios).</li>
+          <li>Specifies optional but recommended Witness mechanism.</li>
+          <li>Specifies optional but recommended Cache Control property.</li>
+        </ul>
+      </section>
     </section>
 
     <section>
