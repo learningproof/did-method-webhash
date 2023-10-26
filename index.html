@@ -297,9 +297,9 @@
         Target system
       </h2>
       <p>
-        The target system of the webhash DID method is the host (or domain if
-        the host is not specified) name when the domain specified by the DID is
-        resolved through the Domain Name System (DNS).
+        The target system of the <code>webhash</code> DID method is the host
+        (or domain if the host is not specified) name when the domain specified
+        by the DID is resolved through the Domain Name System (DNS).
       </p>
 
     </section>
@@ -544,18 +544,6 @@ did:webhash:example.com%3A3000:user:alice
           a new (and newly-proofed) DID document. This new DID document MUST
           also be published at the path corresponding to the identifier
           <strong>with</strong> the new document's hash segment.
-        </p>
-
-        <div class="issue" data-number="7">Should this paragraph be removed in
-        leiu of a Witnessing section?</div>
-        <p class="note">
-          Managing updates to the DID Document using a version control system
-          such as git and/or a continuous integration system such as GitHub
-          Actions can provide support for authentication and audit history,
-          whether as an input to the witnessing services described in the
-          section "Witnessing Services" or as a fallback for manual
-          verification when Witnessing Services cannot be relied upon to
-          vouchsafe historical records of a DID document's history.
         </p>
 
         <p class="note" title="HTTP API">
