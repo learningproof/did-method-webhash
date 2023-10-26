@@ -97,6 +97,26 @@
 
     <section>
       <h2>
+        Design Constraints
+      </h2>
+
+      <p>
+        This DID method was developed with the following design constraints:
+      </p>
+
+      <ol>
+        <li><strong>Backwards compatibility</strong>:  Resolvable by <code>did:web</code>
+          resolvers (for a given <code>did:webhash</code> DID, if the
+          <code>webhash</code> method keyword is changed to <code>web</code>,
+          an existing DID Web resolver is able to fetch and process it).
+        </li>
+        <li><strong>Static web hosting</strong>: DID Documents must be able to
+          be hosted on static web servers (with no support for query parameters).</li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>
         Relationship to Other DID Methods
       </h2>
 
@@ -109,9 +129,14 @@
         <li><code>did:web</code></li>
         <li><code>did:webs</code> - see the
           <a href="https://trustoverip.github.io/tswg-did-method-webs-specification/">DID Method did:webs Specification</a></li>
-        <li><code>did:webplus</code> - see <a href="https://github.com/LedgerDomain/did-webplus">https://github.com/LedgerDomain/did-webplus</a></li>
+        <li><code>did:webplus</code> - see
+          <a href="https://github.com/LedgerDomain/did-webplus">https://github.com/LedgerDomain/did-webplus</a></li>
       </ul>
+
+      <div class="issue">Add text comparing did:webhash to did:webs and similar
+        methods.</div>
     </section>
+
     <section>
       <h2>
         Examples
