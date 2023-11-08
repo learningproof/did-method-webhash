@@ -105,17 +105,21 @@
       </p>
 
       <ol>
-        <li><strong>Backwards compatibility</strong>:  Resolvable by <code>did:web</code>
-          resolvers (for a given <code>did:webhash</code> DID, if the
-          <code>webhash</code> method keyword is changed to <code>web</code>,
-          an existing DID Web resolver is able to fetch and process it).
-        </li>
         <li><strong>Static web hosting</strong>: DID Documents must be able to
           be hosted on static web servers (with no support for query parameters
-          or custom HTTP headers).</li>
+          or custom HTTP headers).
+        </li>
+        <li><strong>Prefer Backwards compatibility</strong>:
+          Whenever possible, `did:webhash` DIDs should be resolvable by <code>did:web</code>
+          resolvers. That is, for a given DID, if the
+          <code>webhash</code> method keyword is changed to <code>web</code>,
+          an existing DID Web resolver is able to fetch and process it.
+        </li>
+        <li><strong>Modular Trait-Based Design</strong>:
+          The various security features added to this method (as compared with <code>did:web</code>)
+          should be modular, and reusable by any other DID Method.
+        </li>
       </ol>
-
-      <div class="issue">Should modularity / using Traits be a design issue?</div>
 
       <section>
         <h3>
@@ -128,7 +132,6 @@
           necessary).
         </div>
       </section>
-
 
       <section>
         <h3>
