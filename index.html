@@ -60,6 +60,11 @@
 <body>
   <section id="abstract">
     <p>
+      <code>did:webhash</code> is: <code>did:web</code> + self-certifying URLs +
+      signed documents + version history + key rotation logs + certificate
+      transparency style witnesses.
+    </p>
+    <p>
       DIDs that require a distributed ledger or trusted clients for resolutions
       face significant practical challenges in anchoring trust for many
       use-cases targeted by the DID WG at W3C. Conversely, however, DNS-based
@@ -85,7 +90,7 @@
         Preface
       </h2>
       <p>
-        The WebHash DID method specification conforms to the requirements specified
+        The Webhash DID method specification conforms to the requirements specified
         in the Decentralized Identifiers v1.0 Specification [[DID-CORE]]. For
         more information about DIDs and DID method specifications, please also
         see the [[?DID-PRIMER]]
@@ -110,14 +115,15 @@
           or custom HTTP headers).
         </li>
         <li><strong>Prefer Backwards compatibility</strong>:
-          Whenever possible, `did:webhash` DIDs should be resolvable by <code>did:web</code>
-          resolvers. That is, for a given DID, if the
+          Whenever possible, `did:webhash` DIDs should be resolvable by
+          <code>did:web</code> resolvers. That is, for a given DID, if the
           <code>webhash</code> method keyword is changed to <code>web</code>,
           an existing DID Web resolver is able to fetch and process it.
         </li>
         <li><strong>Modular Trait-Based Design</strong>:
-          The various security features added to this method (as compared with <code>did:web</code>)
-          should be modular, and reusable by any other DID Method.
+          The various security features added to this method (as compared with
+          <code>did:web</code>) should be modular, and reusable by any other
+          DID Method.
         </li>
       </ol>
 
@@ -127,9 +133,9 @@
         </h3>
 
         <div class="issue">Add section on the did:webhash Trust Model (requires
-          DNS/ICANN/CA infrastructure for resolution, website operator has the power
-          to disrupt key rotation chains, which means Witnesses are ultimately
-          necessary).
+          DNS/ICANN/CA infrastructure for resolution, website operator has the
+          power to disrupt key rotation chains, which means Witnesses are
+          ultimately necessary).
         </div>
       </section>
 
@@ -139,9 +145,9 @@
         </h3>
 
         <p>The division of responsibilities into two different parties,
-          separating the web server Operator from the DID Controller, is a primary
-          motivation for creating a new DID method instead of continuing to
-          use <code>did:web</code>.
+          separating the web server Operator from the DID Controller, is a
+          primary motivation for creating a new DID method instead of continuing
+          to use <code>did:web</code>.
         </p>
 
         <ul>
@@ -194,7 +200,8 @@
             the <code>controller</code> DID (specifically, by a key
             authorized in its <code>assertionMethod</code> section).
           </li>
-          <li>Requires the use of an entropic identifier as a path fragment.</li>
+          <li>Requires the use of a path fragment which binds a given DID
+            document to the initial inception event.</li>
           <li>Because there is always a path fragment, no <code>.well-known/</code>
             directory mechanism is used for a DID at the "top" domain level.</li>
           <li>Requires the use of Tombstones when a DID is deactivated.</li>
@@ -212,8 +219,7 @@
       </h2>
 
       <div class="issue" data-number="1"></div>
-      <pre class="example"
-        title="Example did:webhashhash DID document using JSON Web Keys">
+      <pre class="example" title="Example initial DID document">
 {
   "@context": [
     "https://www.w3.org/ns/did/v1",
@@ -221,9 +227,17 @@
     "https://w3id.org/security/suites/jws-2020/v1"
   ],
   "id": "did:webhash:example.com",
-  "verificationMethod": [
+
+  // Note that in this example, the controller is a different DID
+  "controller": "did:key:z6MkpTHR8VNsBxYAAWHut2Geadd9jSwuBV8xRoAnwWsdvktH",
+
+  // This is the first DID Document in the chain; no previous version exists
+  prev: null,
+
+  // Keys to be used for DID Authentication only
+  "authentication": [
     {
-      "id": "did:webhash:example.com#key-0",
+      "id": "did:webhash:example.com#key-1",
       "type": "JsonWebKey2020",
       "controller": "did:webhash:example.com",
       "publicKeyJwk": {
@@ -231,17 +245,10 @@
         "crv": "Ed25519",
         "x": "0-e2i2_Ua1S5HbTYnVB0lj2Z2ytXu2-tYmDFf8f5NjU"
       }
-    },
-    {
-      "id": "did:webhash:example.com#key-1",
-      "type": "JsonWebKey2020",
-      "controller": "did:webhash:example.com",
-      "publicKeyJwk": {
-        "kty": "OKP",
-        "crv": "X25519",
-        "x": "9GXjPGGvmRq9F6Ng5dQQ_s31mfhxrcNZxRGONrmH30k"
-      }
-    },
+    }
+  ],
+  // Keys to be used for signing VCs, DIDs, key rotation events, etc
+  "assertionMethod": [
     {
       "id": "did:webhash:example.com#key-2",
       "type": "JsonWebKey2020",
@@ -252,20 +259,30 @@
         "x": "38M1FDts7Oea7urmseiugGW7tWc3mLpJh6rKe7xINZ8",
         "y": "nDQW6XZ7b_u2Sy9slofYLlG03sOEoug3I0aAPQ0exs4"
       }
-    },
+    }
   ],
-  "authentication": [
-    "did:webhash:example.com#key-0",
-    "did:webhash:example.com#key-2"
-  ],
-  "assertionMethod": [
-    "did:webhash:example.com#key-0",
-    "did:webhash:example.com#key-2"
-  ],
+  // Keys to be used for encryption (key agreement) only
   "keyAgreement": [
-    "did:webhash:example.com#key-1",
-    "did:webhash:example.com#key-2"
-  ]
+    {
+      "id": "did:webhash:example.com#key-3",
+      "type": "JsonWebKey2020",
+      "controller": "did:webhash:example.com",
+      "publicKeyJwk": {
+        "kty": "OKP",
+        "crv": "X25519",
+        "x": "9GXjPGGvmRq9F6Ng5dQQ_s31mfhxrcNZxRGONrmH30k"
+      }
+    }
+  ],
+
+  "service": [{
+    "type": "TransparencyService",
+    "serviceEndpoint": "https://key-log.example.com"
+  }],
+
+  proof: {
+     // ... DID Doc signed by controller's 'assertionMethod' key
+  }
 }
         </pre>
 
@@ -273,7 +290,9 @@
         <pre class="example"
         title="Example did:webhash DID document using an ethereum address">
 {
-  "@context": ["https://www.w3.org/ns/did/v1", "https://w3id.org/security/suites/secp256k1recovery-2020/v2"],
+  "@context": [
+    "https://www.w3.org/ns/did/v1", "https://w3id.org/security/suites/secp256k1recovery-2020/v2"
+  ],
   "id": "did:webhash:example.com",
   "verificationMethod": [{
       "id": "did:webhash:example.com#address-0",
@@ -292,7 +311,7 @@
 
   <section>
     <h1>
-      webhash DID Method Specification
+      <code>webhash</code> DID Method Specification
     </h1>
 
     <section>
@@ -316,8 +335,8 @@
       </p>
       <p>
         A DID that uses this method MUST begin with the following prefix:
-        <code>did:webhash</code>. Per the DID specification, this string MUST be in
-        lowercase. The remainder of the DID, after the prefix, is specified
+        <code>did:webhash</code>. Per the DID specification, this string MUST be
+        in lowercase. The remainder of the DID, after the prefix, is specified
         below.
       </p>
     </section>
@@ -348,7 +367,7 @@
       <p>
         The syntax of a <code>webhash</code> DID string, expressed as a pseudo
         regular expression, is:<br>
-        <code>did:webhash:{valid domain}[:[^/:#?]+]*[:{hash of first DID document}]{0,1}</code>
+        <code>did:webhash:{valid domain}[:[^/:#?]+]*[:{Initial creation event trust anchor}]{0,1}</code>
       </p>
 
       <pre class="nohighlight">
@@ -387,10 +406,10 @@ did:webhash:example.com%3A3000
       <p>
         Whenever a DID URL is present within a `did:webhash` document, it MUST
         be an absolute URL *without* the hash-segment appended.
-      <p class="note">
-        This includes URLs inside of embedded key material and other metadata, and
-        prevents key confusion attacks.
-      </p>
+        <p class="note">
+          This includes URLs inside of embedded key material and other metadata, and
+          prevents key confusion attacks.
+        </p>
       </p>
     </section>
 
@@ -403,27 +422,60 @@ did:webhash:example.com%3A3000
           CRUD API
         </h3>
         <p>
-          There is intentionally no HTTP API specified for the did:webhash
+          There is intentionally no HTTP API specified for the <code>did:webhash</code>
           method operations, leaving programmatic registrations and management
           to be defined by each implementation, or based on their own
           requirements in their web environment.
         </p>
+
+        <div class="issue">
+          Add some example HTTP-based APIs for creating and editing resources,
+          such as Solid, AtomPub, etc.
+        </div>
       </section>
       <section>
         <h3>
           Create (Register)
         </h3>
         <p>
-          Creating a DID is done by:
+          To create a <code>did:webhash</code> DID and its corresponding
+          document, you'll need a domain and a web server. Specifically,
+          one must meet the following pre-requisite requirements:
+        </p>
+        <ul>
+          <li>
+            Select a registered domain that has a valid domain certificate,
+            that is running a web server able to serve static files.
+            That is, a domain able to be resolved using the <code>https</code>
+            URL scheme.
+          </li>
+          <li>
+            Have sufficient authorization/privileges to be able to create
+            resources (folders and files), to be served by that web server.
+            For example, to create a <code>did:webhash</code> DID at the
+            domain <code>https://webserver.example</code>, you'll need to be
+            able to create resources at the web path <code>/</code>. That is,
+            to create a directory <code>abcd12345</code>, such that it'll be
+            resolvable via <code>https://webserver.example/abcd12345/</code>
+          </li>
+        </ul>
+        <p>
+          Once those pre-requisites are met, creating a DID is done by:
         </p>
         <ol>
           <li>
-            applying at a domain name registrar for use of a domain name and
+            Select a public-private signing key pair that will serve as the
+            <em>controller key</em>. This key will be used to sign the initial
+            DID Document, as well as to sign subsequent DID Document update
+            events.
           </li>
           <li>
-            storing the location of a hosting service, the IP address at a DNS
-            lookup service
+            Generate a JWK Thumbprint (see
+            <a href="https://datatracker.ietf.org/doc/html/rfc7638">RFC7638</a>)
+            of the controller key.
           </li>
+
+
           <li>
             creating the payload DID document (without <code>proof</code>
             object) that will be hashed and then signed with all the relevant
@@ -666,8 +718,8 @@ did:webhash:example.com%3A3000:user:alice
         <p>
           This DID method does not specify any authentication or authorization
           mechanism for writing to, removing or creating the DID Document,
-          leaving it up to implementations to protect did:webhash documents as with
-          any other web resource.
+          leaving it up to implementations to protect did:webhash documents as
+          with any other web resource.
         </p>
         <p>
           It is up to implementer to secure their web environments according to
@@ -707,17 +759,17 @@ did:webhash:example.com%3A3000:user:alice
           DNS Privacy Considerations
         </h4>
         <p>
-          Due to the nature of the did:webhash method relying upon a DNS in order to
-          resolve the web server, all resolutions of a did:webhash identifier have
-          the potential to be tracked by a DNS provider. Additionally, due to
-          the DID Document being stored on a web server, each time the DID
-          Document resource is retrieved, the web server has the ability to
-          track the resolution of the DID Document. To mitigate the issue of the
-          relying party being tracked when resolving the DID Document the
-          relying party should look to either use a trusted universal resolver
-          service to gain herd privacy, utilize a VPN service or perform a
-          resolution over the TOR network. Another emerging solution that will
-          be useful to address this is <a
+          Due to the nature of the did:webhash method relying upon a DNS in
+          order to resolve the web server, all resolutions of a did:webhash
+          identifier have the potential to be tracked by a DNS provider.
+          Additionally, due to the DID Document being stored on a web server,
+          each time the DID Document resource is retrieved, the web server has
+          the ability to track the resolution of the DID Document. To mitigate
+          the issue of the relying party being tracked when resolving the DID
+          Document the relying party should look to either use a trusted
+          universal resolver service to gain herd privacy, utilize a VPN service
+          or perform a resolution over the TOR network. Another emerging
+          solution that will be useful to address this is <a
             href="https://tools.ietf.org/html/draft-pauly-dprive-oblivious-doh-03">
             draft-pauly-dprive-oblivious-doh-03</a>
         </p>
